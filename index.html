@@ -7,31 +7,48 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app">
         <header class="header">
+            <div class="header-glow"></div>
             <div class="header-content">
                 <div class="logo">
-                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 6v6l4 2"/>
-                    </svg>
-                    <h1>HN GitHub Trends</h1>
+                    <div class="logo-wrapper">
+                        <div class="logo-pulse"></div>
+                        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>HN GitHub<span class="gradient-text">Trends</span></h1>
+                        <p class="tagline">Discover what's hot in dev</p>
+                    </div>
                 </div>
                 <div class="header-actions">
+                    <div class="time-display" id="timeDisplay">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12,6 12,12 16,14"/>
+                        </svg>
+                        <span id="currentTime"></span>
+                    </div>
                     <div class="filter-group">
                         <select id="timeFilter" class="filter-select">
-                            <option value="1">Last 24 Hours</option>
-                            <option value="3" selected>Last 3 Days</option>
+                            <option value="1" selected>Last 24 Hours</option>
+                            <option value="3">Last 3 Days</option>
                             <option value="7">Last 7 Days</option>
                         </select>
                     </div>
                     <button id="refreshBtn" class="refresh-btn" title="Refresh">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M23 4v6h-6M1 20v-6h6"/>
-                            <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                            <path d="M21 12a9 9 0 00-9-9 9.75 9.75 0 00-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                            <path d="M3 12a9 9 0 009 9 9.75 9.75 0 006.74-2.74L21 16"/>
+                            <path d="M16 21h5v-5"/>
                         </svg>
                     </button>
                 </div>
@@ -40,42 +57,136 @@
 
         <main class="main">
             <div class="stats-bar">
-                <div class="stat">
+                <div class="stat stat-glow">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
                     <span class="stat-value" id="totalRepos">0</span>
-                    <span class="stat-label">Repositories</span>
+                    <span class="stat-label">Repos Trending</span>
                 </div>
-                <div class="stat">
+                <div class="stat stat-glow">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
                     <span class="stat-value" id="totalUpvotes">0</span>
                     <span class="stat-label">Total Upvotes</span>
                 </div>
-                <div class="stat">
+                <div class="stat stat-glow">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                        </svg>
+                    </div>
                     <span class="stat-value" id="totalPosts">0</span>
                     <span class="stat-label">HN Posts</span>
                 </div>
             </div>
 
             <div id="loading" class="loading">
-                <div class="loading-spinner"></div>
-                <p>Fetching trending repositories...</p>
+                <div class="loading-container">
+                    <div class="loading-orb">
+                        <div class="orb-ring"></div>
+                        <div class="orb-ring-delay"></div>
+                        <div class="orb-core"></div>
+                    </div>
+                    <div class="loading-steps">
+                        <div class="loading-step" data-step="hn">
+                            <div class="step-indicator"></div>
+                            <span>Scanning Hacker News</span>
+                        </div>
+                        <div class="loading-step" data-step="github">
+                            <div class="step-indicator"></div>
+                            <span>Fetching GitHub data</span>
+                        </div>
+                        <div class="loading-step" data-step="render">
+                            <div class="step-indicator"></div>
+                            <span>Building results</span>
+                        </div>
+                    </div>
+                    <div class="loading-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-text" id="progressText">0%</span>
+                    </div>
+                </div>
             </div>
 
             <div id="error" class="error hidden">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-                <p id="errorMessage">Something went wrong</p>
-                <button id="retryBtn" class="retry-btn">Try Again</button>
+                <div class="error-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </div>
+                <h3>Oops! Something broke</h3>
+                <p id="errorMessage">Failed to load data</p>
+                <button id="retryBtn" class="retry-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12a9 9 0 00-9-9 9.75 9.75 0 00-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                        <path d="M3 12a9 9 0 009 9 9.75 9.75 0 006.74-2.74L21 16"/>
+                        <path d="M16 21h5v-5"/>
+                    </svg>
+                    Try Again
+                </button>
             </div>
 
-            <div id="content" class="content">
+            <div id="content" class="content hidden">
+                <div class="content-header">
+                    <h2 class="section-title">
+                        <span class="title-icon">🔥</span>
+                        Trending Repositories
+                    </h2>
+                    <div class="sort-options">
+                        <button class="sort-btn active" data-sort="upvotes">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            Hot
+                        </button>
+                        <button class="sort-btn" data-sort="stars">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                            Stars
+                        </button>
+                        <button class="sort-btn" data-sort="recent">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12,6 12,12 16,14"/>
+                            </svg>
+                            Recent
+                        </button>
+                    </div>
+                </div>
                 <div id="repoGrid" class="repo-grid"></div>
             </div>
         </main>
 
         <footer class="footer">
-            <p>Data from <a href="https://news.ycombinator.com" target="_blank">Hacker News</a> & <a href="https://github.com" target="_blank">GitHub</a></p>
+            <div class="footer-content">
+                <div class="footer-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <span>Autopilot Mode</span>
+                </div>
+                <p>Powered by <a href="https://news.ycombinator.com" target="_blank">Hacker News</a> & <a href="https://github.com" target="_blank">GitHub API</a></p>
+                <p class="footer-sub">Built with ⚡ for the dev community</p>
+            </div>
         </footer>
     </div>
 
