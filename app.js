@@ -7,7 +7,39 @@ const state = {
     daysFilter: 1,
     sortBy: 'upvotes',
     progress: 0,
-    detailRepo: null
+    detailRepo: null,
+    loadingPhase: '',
+    msgTimer: null
+};
+
+const waitingMessages = {
+    hn: [
+        'Scanning top stories on Hacker News...',
+        'Checking what the community is talking about...',
+        'Fetching story IDs from the HN API...',
+        'Looking for trending discussions...',
+        'Still loading — HN serves data in batches...',
+        'Processing story scores and timestamps...',
+        'Filtering for recent posts...',
+        'Almost there with the HN data...'
+    ],
+    github: [
+        'Contacting the GitHub API for repo details...',
+        'Fetching stars, forks, and descriptions...',
+        'Looking up repository metadata...',
+        'This takes a moment — one repo at a time...',
+        'Building the full picture for each project...',
+        'Cross-referencing HN posts with GitHub repos...',
+        'Still fetching — GitHub API handles one request at a time...',
+        'Adding language and license info...'
+    ],
+    render: [
+        'Building the results page...',
+        'Almost ready — putting it all together...',
+        'Sorting repositories by popularity...',
+        'Rendering repository cards...',
+        'Finishing up — just a sec...'
+    ]
 };
 
 const $ = id => document.getElementById(id);
@@ -70,6 +102,27 @@ function setProgress(pct, text) {
     if (text) el.loadingText.textContent = text;
 }
 
+function startWaitingMessages(phase) {
+    stopWaitingMessages();
+    state.loadingPhase = phase;
+    const msgs = waitingMessages[phase];
+    if (!msgs) return;
+    let idx = 0;
+    el.loadingText.textContent = msgs[0];
+    state.msgTimer = setInterval(() => {
+        idx++;
+        if (idx < msgs.length) {
+            el.loadingText.textContent = msgs[idx];
+        } else {
+            el.loadingText.textContent = msgs[msgs.length - 1];
+        }
+    }, 3000);
+}
+
+function stopWaitingMessages() {
+    if (state.msgTimer) { clearInterval(state.msgTimer); state.msgTimer = null; }
+}
+
 function showView(name) {
     el.loadingView.classList.toggle('hidden', name !== 'loading');
     el.errorView.classList.toggle('hidden', name !== 'error');
@@ -90,20 +143,26 @@ async function loadData() {
     state.loading = true;
     el.refreshBtn.classList.add('loading');
     showView('loading');
-    setProgress(5, 'Loading from Hacker News...');
+    setProgress(5, '');
+    startWaitingMessages('hn');
 
     try {
         const posts = await fetchHNPosts();
-        setProgress(40, 'Extracting GitHub repositories...');
+        setProgress(40, '');
+        startWaitingMessages('github');
         const repoList = extractGitHubRepos(posts);
-        setProgress(55, 'Fetching GitHub repository details...');
+        setProgress(55, '');
         await fetchGitHubDetails(repoList);
-        setProgress(90, 'Building results...');
+        stopWaitingMessages();
+        setProgress(90, '');
+        startWaitingMessages('render');
         updateStats();
         renderList();
+        stopWaitingMessages();
         setProgress(100, 'Done!');
         setTimeout(() => { showView('main'); state.loading = false; el.refreshBtn.classList.remove('loading'); }, 300);
     } catch (err) {
+        stopWaitingMessages();
         el.errorText.textContent = 'Failed to load data. ' + err.message;
         showView('error');
         state.loading = false;
