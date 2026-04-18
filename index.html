@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HN GitHub Trends</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    <h1>HN GitHub Trends</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="filter-group">
+                        <select id="timeFilter" class="filter-select">
+                            <option value="1">Last 24 Hours</option>
+                            <option value="3" selected>Last 3 Days</option>
+                            <option value="7">Last 7 Days</option>
+                        </select>
+                    </div>
+                    <button id="refreshBtn" class="refresh-btn" title="Refresh">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 4v6h-6M1 20v-6h6"/>
+                            <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="stats-bar">
+                <div class="stat">
+                    <span class="stat-value" id="totalRepos">0</span>
+                    <span class="stat-label">Repositories</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="totalUpvotes">0</span>
+                    <span class="stat-label">Total Upvotes</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="totalPosts">0</span>
+                    <span class="stat-label">HN Posts</span>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Fetching trending repositories...</p>
+            </div>
+
+            <div id="error" class="error hidden">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <p id="errorMessage">Something went wrong</p>
+                <button id="retryBtn" class="retry-btn">Try Again</button>
+            </div>
+
+            <div id="content" class="content">
+                <div id="repoGrid" class="repo-grid"></div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Data from <a href="https://news.ycombinator.com" target="_blank">Hacker News</a> & <a href="https://github.com" target="_blank">GitHub</a></p>
+        </footer>
+    </div>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <div id="modalBody" class="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
